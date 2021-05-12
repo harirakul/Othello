@@ -1,5 +1,3 @@
-import javax.swing.SwingUtilities;
-
 import othello.*;
 
 public class Main {
@@ -8,15 +6,6 @@ public class Main {
         Board b = new Board();
         System.out.println(b);
 
-
-
-        GUI game_window = new GUI();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run(){
-                new GUI().setVisible(true);
-            }
-        });
-
+        new GUI();
     }
 }

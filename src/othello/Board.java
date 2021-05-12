@@ -37,9 +37,6 @@ public class Board{
 
     public String toString(){
         // For debugging purposes
-        String row_designation = "ABCDEFGHIJ";
-        int index = 0;
-
         for(int i = 1; i < 10; i++){
             System.out.print( ANSI_YELLOW + "| " + ANSI_RED + i + " ");
         }
