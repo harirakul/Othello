@@ -1,6 +1,7 @@
 package othello;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 // -1 represents a white piece
 // 1 represents a black piece
@@ -103,8 +104,9 @@ public class Board{
                             newCol += offset[1];
                         }
                         if (grid[newRow][newCol] == turn){
-                            if ((newRow == i && Math.abs(newCol - j) > 1) || 
-                                (newCol == j && Math.abs(newRow - i) > 1)){
+                            if ((newRow == i && Math.abs(newCol - j) > 1) || // In the same row?
+                                (newCol == j && Math.abs(newRow - i) > 1) || // In the same col?
+                                (Math.abs(newCol - j) > 1 && Math.abs(newRow - i) > 1)){ //Diagonal?
                                     legalMoves.add(new Integer[]{i, j});
                                     break;  // Now consider the next square.
                             } 
@@ -115,6 +117,54 @@ public class Board{
         }
 
         return legalMoves;
+    }
+
+    /*
+    Returns true if the specified move is legal, false otherwise.
+    */
+    public boolean isLegal(int row, int col){
+        ArrayList<Integer[]> legals = this.getLegalMoves();
+        Integer[] move = {row, col};
+        for (Integer[] legalMove: legals){
+            if (Arrays.equals(move, legalMove)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+    Places a piece on the specified square if the move is legal.
+    Flips the corresponding pieces that need to be flipped.
+    Increments the turn counter.
+    */
+    public void playMove(int row, int col){
+        if (this.isLegal(row, col)){
+            this.setPiece(turn, row, col);
+            // Identify in what squares pieces need to be flipped.
+            for(int[] offset: offsets){
+                int newRow = row + offset[0];
+                int newCol = col + offset[1];
+                int count = 1;
+                while (inBounds(newRow, newCol) && grid[newRow][newCol] == -turn){
+                    newRow += offset[0];
+                    newCol += offset[1];
+                    count++;
+                }
+                if (grid[newRow][newCol] == turn){
+                    if ((newRow == row && Math.abs(newCol - col) > 1) || 
+                    (newCol == col && Math.abs(newRow - row) > 1) || 
+                    (Math.abs(newCol - col) > 1 && Math.abs(newRow - row) > 1)){
+                        // Flippable line identified, now backtrack, and flip all opponent coins
+                        for (int i = 1; i < count; i++){
+                            this.flip(newRow - offset[0], newCol - offset[1]);
+                        }
+                    } 
+                }
+            }
+            turn *= -1;
+            System.out.println(this);
+        }
     }
 
     /*
