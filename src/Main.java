@@ -8,8 +8,8 @@ public class Main {
         Board b = new Board();
         System.out.println(b);
 
-        ArrayList<Integer[]> possible = b.possibleMoves();
-        for (Integer[] move: possible){
+        ArrayList<Integer[]> legals = b.getLegalMoves();
+        for (Integer[] move: legals){
             System.out.println(move[0] + " " + move[1]);
         }
 

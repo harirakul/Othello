@@ -18,6 +18,11 @@ public class Board{
     private String AI = ANSI_BLACK + "B " + ANSI_RESET;
     private String emptySpace = "  ";
 
+    private int[][] offsets = {
+        {0, 1}, {1, 0}, {0, -1}, {-1, 0},   // Adjacent Squares
+        {1, 1}, {1, -1}, {-1, -1}, {-1, 1}  // Diagonal Squares
+    };
+
     public Board(){
         grid = new int[10][10];
         grid[4][4] = -1;
@@ -68,11 +73,6 @@ public class Board{
     of a specified square contains a specified color.
     */
     public boolean nearbySquaresContain(int target, int row, int col){
-        int[][] offsets = {
-            {0, 1}, {1, 0}, {0, -1}, {-1, 0},   // Adjacent Squares
-            {1, 1}, {1, -1}, {-1, -1}, {-1, 1}  // Diagonal Squares
-        };
-
         for (int[] offset: offsets){
             int newRow = row + offset[0];
             int newCol = col + offset[1];
@@ -84,34 +84,35 @@ public class Board{
     }
 
     /*
-    Finds the squares that are adjacent or directly diagonal to an enemy piece of the current player.
-    These are "possible squares" - pieces may only be placed in these squares, but not all of them are legal.
-    The purpose is to isolate these squares for analysis in other methods (rather than analyze every square).
-    */
-    public ArrayList<Integer[]> possibleMoves(){
-        ArrayList<Integer[]> possibleMoves = new ArrayList<Integer[]>();
-
-        for (int i = 0; i < 10; i++){
-            for (int j = 0; j < 10; j++){
-                if (isEmpty(i, j) && nearbySquaresContain(-turn, i, j)){
-                    Integer[] square = {i, j};
-                    possibleMoves.add(square);
-                }
-            }
-        }
-
-        return possibleMoves;
-    }
-
-    /*
     Returns a list of all the possible legal moves for the current player.
     Each legal move will be an integer array with length of 2 to contain the row and column.
     An ArrayList is used since the number of possible of legal moves changes with the position.
     */
     public ArrayList<Integer[]> getLegalMoves(){
-        ArrayList<Integer[]> legalMoves = possibleMoves();
+        ArrayList<Integer[]> legalMoves = new ArrayList<Integer[]>();
 
-        // Iterate through the possible moves and delete the moves that are illegal.
+        for (int i = 0; i < 10; i++){
+            for (int j = 0; j < 10; j++){
+                if (isEmpty(i, j) && nearbySquaresContain(-turn, i, j)){
+                    // Possible square identified, now iterate through rows, cols, and diagonals to check if its legal
+                    for (int[] offset: offsets){
+                        int newRow = i + offset[0];
+                        int newCol = j + offset[1];
+                        while (inBounds(newRow, newCol) && grid[newRow][newCol] == -turn){
+                            newRow += offset[0];
+                            newCol += offset[1];
+                        }
+                        if (grid[newRow][newCol] == turn){
+                            if ((newRow == i && Math.abs(newCol - j) > 1) || 
+                                (newCol == j && Math.abs(newRow - i) > 1)){
+                                    legalMoves.add(new Integer[]{i, j});
+                                    break;  // Now consider the next square.
+                            } 
+                        }
+                    }
+                }
+            }
+        }
 
         return legalMoves;
     }
