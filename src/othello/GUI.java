@@ -3,19 +3,21 @@ package othello;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class GUI extends JFrame{
     private final int WIDTH = 600;
     private final int HEIGHT = 600;
     private Tile[][] buttonGrid = new Tile[10][10];
     private JPanel buttonPannel = new JPanel();
-    private Board board = new Board();;
+    private Board board = new Board();
 
     public GUI()
     {
         for (int i = 0; i < 10; i++){
             for (int j = 0; j < 10; j++){
-                buttonGrid[i][j] = new Tile(i, j);
+                buttonGrid[i][j] = new Tile(this, i, j);
             }
         }
         
@@ -35,7 +37,7 @@ public class GUI extends JFrame{
 
         for (int i = 0; i < 10; i++){
             for (int j = 0; j < 10; j++){
-                Tile t = new Tile(i, j);
+                Tile t = new Tile(this, i, j);
                 t.setPiece(board.getPiece(i, j));
                 buttonGrid[i][j] = t;
                 buttonPannel.add(t);
@@ -43,6 +45,11 @@ public class GUI extends JFrame{
         }
 
         SwingUtilities.updateComponentTreeUI(this);
+    }
+
+    public void onClick(int row, int col){
+        board.playMove(row, col);
+        refreshGrid();
     }
 
     // public void drawBoard(Graphics g)
@@ -75,14 +82,24 @@ public class GUI extends JFrame{
 class Tile extends JButton {
     private int row;
     private int col;
+    private GUI parent;
 
-    public Tile(int row, int col){
+    public Tile(GUI parent, int row, int col){
+        this.parent = parent;
         this.row = row;
         this.col = col;
 
         super.setSize(60, 60);
         super.setBackground(new Color(45, 174, 82));
         super.setBorder(new LineBorder(Color.BLACK));
+
+        this.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(row + " " + col);
+                parent.onClick(row, col);
+            }
+            
+        });
     }
 
     public int getRow(){

@@ -103,7 +103,7 @@ public class Board{
                             newRow += offset[0];
                             newCol += offset[1];
                         }
-                        if (grid[newRow][newCol] == turn){
+                        if (inBounds(newRow, newCol) && grid[newRow][newCol] == turn){
                             if ((newRow == i && Math.abs(newCol - j) > 1) || // In the same row?
                                 (newCol == j && Math.abs(newRow - i) > 1) || // In the same col?
                                 (Math.abs(newCol - j) > 1 && Math.abs(newRow - i) > 1)){ //Diagonal?
@@ -151,15 +151,12 @@ public class Board{
                     newCol += offset[1];
                     count++;
                 }
-                if (grid[newRow][newCol] == turn){
-                    if ((newRow == row && Math.abs(newCol - col) > 1) || 
-                    (newCol == col && Math.abs(newRow - row) > 1) || 
-                    (Math.abs(newCol - col) > 1 && Math.abs(newRow - row) > 1)){
+                if (inBounds(newRow, newCol) && grid[newRow][newCol] == turn){
                         // Flippable line identified, now backtrack, and flip all opponent coins
                         for (int i = 1; i < count; i++){
-                            this.flip(newRow - offset[0], newCol - offset[1]);
+                            this.flip(newRow - offset[0]*i, newCol - offset[1]*i);
                         }
-                    } 
+                    // } 
                 }
             }
             turn *= -1;
