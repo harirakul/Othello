@@ -6,7 +6,7 @@ public class Main {
         Board b = new Board();
         System.out.println(b);
 
-        // b.playMove(3, 4);
+        b.playMove(3, 4);
         // b.playMove(3, 3);
 
         new GUI();
