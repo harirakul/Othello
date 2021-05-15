@@ -1,10 +1,14 @@
 package othello;
 
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class GUI extends JFrame{
     private final int WIDTH = 600;
@@ -33,6 +37,11 @@ public class GUI extends JFrame{
     }
 
     public void refreshGrid(){
+        if (board.gameOver() != 0){
+            new ResultGUI(board.gameOver());
+            return;
+        }
+
         buttonPannel.removeAll();
 
         for (int i = 0; i < 10; i++){
@@ -52,72 +61,37 @@ public class GUI extends JFrame{
         refreshGrid();
     }
 
-    // public void drawBoard(Graphics g)
-    // {
-    //     Graphics2D gfx = (Graphics2D) g;
+    public void simulate(){
+        
+        while (board.gameOver() == 0){
+            ArrayList<Integer[]> legalMoves = board.getLegalMoves();
+            Integer[] move = legalMoves.get((int) (Math.random()*legalMoves.size()));
+            board.playMove(move[0], move[1]);
+            refreshGrid();
 
-    //     int V_dRow = 0;
-    //     int H_dCol = 0;
-    //     for(int i = 0; i < 10; i++)
-    //     {
-    //         gfx.drawLine(V_dRow, 0, V_dRow, HEIGHT);
-    //         V_dRow = V_dRow + WIDTH / 10;
-    //     }
-    //     for(int i = 0; i < 10; i++)
-    //     {
-    //         gfx.drawLine(0, H_dCol, WIDTH, H_dCol);
-    //         H_dCol = H_dCol + HEIGHT / 10;
-            
-    //     }
-    // }
-    
-    // public void paint(Graphics g)
-    // {
-    //     super.paint(g);
-    //     drawBoard(g);
-    // }
-    
+            try {
+                TimeUnit.MILLISECONDS.sleep(125);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        //new ResultGUI(board.gameOver());
+    }
 }
 
-class Tile extends JButton {
-    private int row;
-    private int col;
-    private GUI parent;
+class ResultGUI extends JFrame {
+    private int result;
 
-    public Tile(GUI parent, int row, int col){
-        this.parent = parent;
-        this.row = row;
-        this.col = col;
+    public ResultGUI(int result){
+        this.result = result;
 
-        super.setSize(60, 60);
-        super.setBackground(new Color(45, 174, 82));
-        super.setBorder(new LineBorder(Color.BLACK));
+        super.setSize(300, 200);
+        super.setTitle("Game Over");
+        super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        this.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(row + " " + col);
-                parent.onClick(row, col);
-            }
-            
-        });
+        String text = this.result == 1 ? "Black wins!" : "White wins!";
+        super.add(new JLabel(text, SwingConstants.CENTER));
+
+        super.setVisible(true);
     }
-
-    public int getRow(){
-        return row;
-    }
-
-    public int getCol(){
-        return col;
-    }
-
-    public void setPiece(int pieceColor){
-        if (pieceColor == 1){
-            super.setIcon(new ImageIcon("assets/blackPiece.gif"));
-        }
-        else if (pieceColor == -1){
-            super.setIcon(new ImageIcon("assets/whitePiece.png"));
-        }
-    }
-
-
 }
