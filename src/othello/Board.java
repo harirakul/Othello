@@ -70,6 +70,76 @@ public class Board{
     }
 
     /*
+    Changes the current turn to represent the next player.
+    If the next player has no legal moves, play returns to the current player.
+    */
+    public void incrementTurn(){
+        turn *= -1;
+        if (getLegalMoves().size() == 0){
+            turn *= -1;
+        }
+    }
+
+    /*
+    Returns all spaces on the board have been occupied.
+    */
+    public boolean isFilled(){
+        for (int i = 0; i < 10; i++){
+            for (int j = 0; j < 10; j++){
+                if (grid[i][j] == 0){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /*
+    Returns the number of pieces of the specified color.
+    */
+    public int count(int color){
+        int num = 0;
+        for (int i = 0; i < 10; i++){
+            for (int j = 0; j < 10; j++){
+                if (grid[i][j] == color){
+                    num++;
+                }
+            }
+        }
+        return num;
+    }
+
+    /*
+    Returns 1 if black wins in the current position.
+    Returns -1 if white wins in the current position.
+    Returns 0 if the game is not over.
+    */
+    public int gameOver(){
+        if (isFilled()){
+            System.out.println(count(1) + " " + count(-1));
+            // There are more white pieces than black pieces
+            if (count(-1) > count(1)){
+                return -1;
+            }
+            // There are more black pieces than white pieces
+            return 1;
+        }
+        // If both players can't move:
+        if (getLegalMoves().size() == 0){
+            turn *= -1;
+            if (getLegalMoves().size() == 0){
+                turn *= -1;
+                // Count the majority
+                if (count(-1) > count(1)){
+                    return -1;
+                }
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    /*
     Checks if any of the directly adjacent or diagonal squares 
     of a specified square contains a specified color.
     */
