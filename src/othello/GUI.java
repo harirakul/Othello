@@ -4,16 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
 public class GUI extends JFrame implements ActionListener{
     private final int WIDTH = 600;
     private final int HEIGHT = 600;
     private JMenuBar menuBar;
     private JMenu file, game, edit;
-    private JMenuItem quit, reset, color;
+    private JMenuItem quit, reset, undo, color;
     private Color bg = new Color(45, 174, 82);
+    private Timer timer = new Timer(500, this);;
 
     private Tile[][] buttonGrid = new Tile[10][10];
     private JPanel buttonPannel = new JPanel();
@@ -52,7 +50,9 @@ public class GUI extends JFrame implements ActionListener{
         game = new JMenu("Game");
         reset = new JMenuItem("Reset");
         reset.addActionListener(this);
-        game.add(reset);
+        undo = new JMenuItem("Undo");
+        undo.addActionListener(this);
+        game.add(reset); game.add(undo);
 
         menuBar = new JMenuBar();
         menuBar.add(file); 
@@ -66,16 +66,12 @@ public class GUI extends JFrame implements ActionListener{
     }
 
     public void refreshGrid(){
-        if (board.gameOver() != 0){
-            new ResultGUI(board.gameOver());
-            return;
-        }
-
         buttonPannel.removeAll();
 
         for (int i = 0; i < 10; i++){
             for (int j = 0; j < 10; j++){
                 Tile t = new Tile(this, i, j);
+                t.setHighlighted(board.isLegal(i, j));
                 t.setPiece(board.getPiece(i, j));
                 buttonGrid[i][j] = t;
                 buttonPannel.add(t);
@@ -83,27 +79,36 @@ public class GUI extends JFrame implements ActionListener{
         }
 
         SwingUtilities.updateComponentTreeUI(this);
+
+        if (board.gameOver() != 0){
+            new ResultGUI(board.gameOver());
+            return;
+        }
+    }
+
+    public void engineMove(){
+        //Integer[] bestMove = board.getTurn() == 1 ? Engine.greedySelection(board): Engine.limitOpponentOptions(board);
+        Integer[] bestMove = Engine.limitOpponentOptions(board);
+        board.playMove(bestMove);
+        refreshGrid();
+        //System.out.println(bestMove[0] + " " + bestMove[1]);
     }
 
     public void onClick(int row, int col){
-        board.playMove(row, col);
-        refreshGrid();
+        if (board.isLegal(row, col)){
+            board.playMove(row, col);
+            refreshGrid();
+
+            timer.setRepeats(false);
+            timer.start(); 
+        }
     }
 
     // Temporary Method (to check gameOver):
     public void simulate(){
-        while (board.gameOver() == 0){
-            ArrayList<Integer[]> legalMoves = board.getLegalMoves();
-            Integer[] move = legalMoves.get((int) (Math.random()*legalMoves.size()));
-            board.playMove(move[0], move[1]);
-            refreshGrid();
-
-            try {
-                TimeUnit.MILLISECONDS.sleep(125);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        timer.setRepeats(true);
+        engineMove();
+        timer.start();
     }
 
     public void run(){
@@ -121,9 +126,21 @@ public class GUI extends JFrame implements ActionListener{
             refreshGrid();
         }
 
+        if (e.getSource() == undo){
+            board.undo();
+            refreshGrid();
+        }
+
         if (e.getSource() == color){
             bg = JColorChooser.showDialog(null, "Choose a tile color", bg);
             refreshGrid();
+        }
+
+        if (e.getSource() == timer){
+            engineMove();
+            if (board.getTurn() != 1){
+                timer.start();
+            }
         }
     }
 }

@@ -45,4 +45,13 @@ public class Tile extends JButton {
             super.setIcon(new ImageIcon("assets/whitePiece.png"));
         }
     }
+
+    public void setHighlighted(boolean mode){
+        if (mode){
+            super.setBorder(new LineBorder(Color.WHITE));
+        }
+        else{
+            super.setBorder(new LineBorder(Color.BLACK));
+        }
+    }
 }

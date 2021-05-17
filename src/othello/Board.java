@@ -19,6 +19,8 @@ public class Board{
     private String AI = ANSI_BLACK + "B " + ANSI_RESET;
     private String emptySpace = "  ";
 
+    private ArrayList<int[][]> history; // Used to undo moves.
+
     private int[][] offsets = {
         {0, 1}, {1, 0}, {0, -1}, {-1, 0},   // Adjacent Squares
         {1, 1}, {1, -1}, {-1, -1}, {-1, 1}  // Diagonal Squares
@@ -30,6 +32,9 @@ public class Board{
         grid[5][5] = -1;
         grid[4][5] = 1;
         grid[5][4] = 1;
+
+        history = new ArrayList<int[][]>();
+        savePosition(grid);
     }
 
     /*
@@ -45,6 +50,57 @@ public class Board{
     public void setPiece(int pieceColor, int row, int col){
         if (grid[row][col] == 0){
             grid[row][col] = pieceColor;
+        }
+    }
+
+    /*
+    Returns the current turn.
+    */
+    public int getTurn(){
+        return turn;
+    }
+
+    /*
+    Sets the current turn to the inputted integer.
+    */
+    public void setTurn(int theTurn){
+        turn = theTurn;
+    }
+
+    /*
+    Adds a copy of the inputted grid to the Board history.
+    */
+    public void savePosition(int[][] position){
+        int[][] matrix = new int[10][10];
+        for (int i = 0; i < 10; i++){
+            for (int j = 0; j < 10; j++){
+                matrix[i][j] = grid[i][j];
+            }
+        }
+        history.add(matrix);
+    }
+
+    // /*
+    // Returns a new grid with the current position.
+    // */
+    // public int[][] getPosition(){
+    //     int[][] matrix = new int[10][10];
+    //     for (int i = 0; i < 10; i++){
+    //         for (int j = 0; j < 10; j++){
+    //             matrix[i][j] = grid[i][j];
+    //         }
+    //     }
+    //     return matrix;
+    // }
+
+    /*
+    Sets the position to an inputted grid.
+    */
+    public void setPosition(int[][] grid){
+        for (int i = 0; i < 10; i++){
+            for (int j = 0; j < 10; j++){
+                this.grid[i][j] = grid[i][j];
+            }
         }
     }
 
@@ -206,7 +262,7 @@ public class Board{
     /*
     Places a piece on the specified square if the move is legal.
     Flips the corresponding pieces that need to be flipped.
-    Increments the turn counter.
+    Increments the turn counter and updates position history.
     */
     public void playMove(int row, int col){
         if (this.isLegal(row, col)){
@@ -226,12 +282,16 @@ public class Board{
                         for (int i = 1; i < count; i++){
                             this.flip(newRow - offset[0]*i, newCol - offset[1]*i);
                         }
-                    // } 
                 }
             }
             turn *= -1;
-            System.out.println(this);
+            savePosition(grid);
+            //System.out.println(this);
         }
+    }
+
+    public void playMove(Integer[] move) {
+        playMove(move[0], move[1]);
     }
 
     /*
@@ -243,13 +303,33 @@ public class Board{
                 grid[i][j] = 0;
             }
         }
-        
+
         grid[4][4] = -1;
         grid[5][5] = -1;
         grid[4][5] = 1;
         grid[5][4] = 1;
 
         turn = 1;
+    }
+
+    /*
+    Undoes the previous move.
+    */
+    public void undo(){
+        history.remove(history.size() - 1);
+        setPosition(history.get(history.size() - 1));
+        turn *= -1;
+    }
+
+    /*
+    Returns a new board object with the same position.
+    */
+    public Board copy(){
+        Board b = new Board();
+        b.setPosition(grid);
+        b.setTurn(turn);
+        b.savePosition(grid);
+        return b;
     }
 
     /*
