@@ -1,18 +1,20 @@
 package othello;
 
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-public class GUI extends JFrame{
+public class GUI extends JFrame implements ActionListener{
     private final int WIDTH = 600;
     private final int HEIGHT = 600;
+    private JMenuBar menuBar;
+    private JMenu file, game, edit;
+    private JMenuItem quit, reset, color;
+    private Color bg = new Color(45, 174, 82);
+
     private Tile[][] buttonGrid = new Tile[10][10];
     private JPanel buttonPannel = new JPanel();
     private Board board = new Board();
@@ -27,13 +29,40 @@ public class GUI extends JFrame{
         
         buttonPannel.setLayout(new GridLayout(10, 10));
         refreshGrid();
+        setupMenu();
 
         this.setTitle("Othello");
         this.add(buttonPannel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setSize(WIDTH, HEIGHT);
-        this.setVisible(true);
+    }
+
+    public void setupMenu(){
+        file = new JMenu("File");
+        quit = new JMenuItem("Quit");
+        quit.addActionListener(this);
+        file.add(quit);
+
+        edit = new JMenu("Edit");
+        color = new JMenuItem("Color");
+        color.addActionListener(this);
+        edit.add(color);
+
+        game = new JMenu("Game");
+        reset = new JMenuItem("Reset");
+        reset.addActionListener(this);
+        game.add(reset);
+
+        menuBar = new JMenuBar();
+        menuBar.add(file); 
+        menuBar.add(edit);
+        menuBar.add(game);
+        this.setJMenuBar(menuBar);
+    }
+
+    public Color getColor(){
+        return bg;
     }
 
     public void refreshGrid(){
@@ -61,8 +90,8 @@ public class GUI extends JFrame{
         refreshGrid();
     }
 
+    // Temporary Method (to check gameOver):
     public void simulate(){
-        
         while (board.gameOver() == 0){
             ArrayList<Integer[]> legalMoves = board.getLegalMoves();
             Integer[] move = legalMoves.get((int) (Math.random()*legalMoves.size()));
@@ -75,7 +104,27 @@ public class GUI extends JFrame{
                 e.printStackTrace();
             }
         }
-        //new ResultGUI(board.gameOver());
+    }
+
+    public void run(){
+        this.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == quit){
+            System.exit(0);
+        }  
+
+        if (e.getSource() == reset){
+            board.reset();
+            refreshGrid();
+        }
+
+        if (e.getSource() == color){
+            bg = JColorChooser.showDialog(null, "Choose a tile color", bg);
+            refreshGrid();
+        }
     }
 }
 

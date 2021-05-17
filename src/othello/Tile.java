@@ -17,7 +17,7 @@ public class Tile extends JButton {
         this.col = col;
 
         super.setSize(60, 60);
-        super.setBackground(new Color(45, 174, 82));
+        super.setBackground(parent.getColor());
         super.setBorder(new LineBorder(Color.BLACK));
 
         this.addActionListener(new ActionListener() {

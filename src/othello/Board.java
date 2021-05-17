@@ -235,6 +235,24 @@ public class Board{
     }
 
     /*
+    Resets the board, and the turn counter.
+    */
+    public void reset(){
+        for (int i = 0; i < 10; i++){
+            for (int j = 0; j < 10; j++){
+                grid[i][j] = 0;
+            }
+        }
+        
+        grid[4][4] = -1;
+        grid[5][5] = -1;
+        grid[4][5] = 1;
+        grid[5][4] = 1;
+
+        turn = 1;
+    }
+
+    /*
     Returns a printable, string representation of the board.
     Solely for debugging purposes.
     */
