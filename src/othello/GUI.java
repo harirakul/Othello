@@ -8,14 +8,15 @@ public class GUI extends JFrame implements ActionListener{
     private final int WIDTH = 600;
     private final int HEIGHT = 600;
     private JMenuBar menuBar;
-    private JMenu file, game, edit;
-    private JMenuItem quit, reset, undo, color;
+    private JMenu file, game, edit, subMenu;
+    private JMenuItem quit, reset, undo, color, newPlayer, newAI;
     private Color bg = new Color(45, 174, 82);
-    private Timer timer = new Timer(500, this);;
+    private Timer timer = new Timer(300, this);;
 
     private Tile[][] buttonGrid = new Tile[10][10];
     private JPanel buttonPannel = new JPanel();
     private Board board = new Board();
+    private boolean playingAgainstAI = false;
 
     public GUI()
     {
@@ -38,9 +39,13 @@ public class GUI extends JFrame implements ActionListener{
 
     public void setupMenu(){
         file = new JMenu("File");
+        subMenu = new JMenu("New");
+        newPlayer = new JMenuItem("Game vs Human"); newPlayer.addActionListener(this);
+        newAI = new JMenuItem("Game vs AI"); newAI.addActionListener(this);
+        subMenu.add(newPlayer); subMenu.add(newAI);
         quit = new JMenuItem("Quit");
         quit.addActionListener(this);
-        file.add(quit);
+        file.add(subMenu); file.add(quit);
 
         edit = new JMenu("Edit");
         color = new JMenuItem("Color");
@@ -88,23 +93,26 @@ public class GUI extends JFrame implements ActionListener{
 
     public void engineMove(){
         //Integer[] bestMove = board.getTurn() == 1 ? Engine.greedySelection(board): Engine.limitOpponentOptions(board);
-        Integer[] bestMove = Engine.limitOpponentOptions(board);
+        Integer[] bestMove = Engine.bestMove(board);
+        System.out.println("Engine score: " + Engine.evaluate(board));
         board.playMove(bestMove);
         refreshGrid();
-        //System.out.println(bestMove[0] + " " + bestMove[1]);
+        
     }
 
     public void onClick(int row, int col){
         if (board.isLegal(row, col)){
             board.playMove(row, col);
             refreshGrid();
+            System.out.println("Engine score: " + Engine.evaluate(board));
 
-            timer.setRepeats(false);
-            timer.start(); 
+            if (playingAgainstAI){
+                timer.setRepeats(false);
+                timer.start(); 
+            }
         }
     }
 
-    // Temporary Method (to check gameOver):
     public void simulate(){
         timer.setRepeats(true);
         engineMove();
@@ -121,9 +129,10 @@ public class GUI extends JFrame implements ActionListener{
             System.exit(0);
         }  
 
-        if (e.getSource() == reset){
+        if (e.getSource() == reset || e.getSource() == newPlayer){
             board.reset();
             refreshGrid();
+            playingAgainstAI = false;
         }
 
         if (e.getSource() == undo){
@@ -141,6 +150,12 @@ public class GUI extends JFrame implements ActionListener{
             if (board.getTurn() != 1){
                 timer.start();
             }
+        }
+
+        if (e.getSource() == newAI){
+            board.reset();
+            refreshGrid();
+            playingAgainstAI = true;
         }
     }
 }

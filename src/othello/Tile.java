@@ -22,7 +22,6 @@ public class Tile extends JButton {
 
         this.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println(row + " " + col);
                 parent.onClick(row, col);
             }
             

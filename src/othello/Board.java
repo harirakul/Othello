@@ -80,19 +80,6 @@ public class Board{
         history.add(matrix);
     }
 
-    // /*
-    // Returns a new grid with the current position.
-    // */
-    // public int[][] getPosition(){
-    //     int[][] matrix = new int[10][10];
-    //     for (int i = 0; i < 10; i++){
-    //         for (int j = 0; j < 10; j++){
-    //             matrix[i][j] = grid[i][j];
-    //         }
-    //     }
-    //     return matrix;
-    // }
-
     /*
     Sets the position to an inputted grid.
     */
@@ -137,6 +124,23 @@ public class Board{
     }
 
     /*
+    Returns true if the indicated square is a side square.
+    */
+    public boolean isSide(int row, int col){
+        return (row == 0 || row == 9 || col == 0 || col == 9);
+    }
+
+    /*
+    Returns true if the indicated square is a corner square.
+    */
+    public boolean isCorner(int row, int col){
+        if (row == 0 || row == 9){
+            return (col == 0 || col == 9);
+        }
+        return false;
+    }
+
+    /*
     Returns all spaces on the board have been occupied.
     */
     public boolean isFilled(){
@@ -171,6 +175,7 @@ public class Board{
     Returns 0 if the game is not over.
     */
     public int gameOver(){
+        // When all squares are occupied.
         if (isFilled()){
             System.out.println(count(1) + " " + count(-1));
             // There are more white pieces than black pieces
