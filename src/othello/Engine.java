@@ -32,7 +32,7 @@ public class Engine {
         }
 
         //Adds 10 points for each legal move available.
-        score += board.getLegalMoves().size() * 10;
+        score += board.getLegalMoves().size() * 5;
 
         return score;
     }

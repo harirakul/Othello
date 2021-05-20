@@ -9,7 +9,7 @@ public class GUI extends JFrame implements ActionListener{
     private final int HEIGHT = 600;
     private JMenuBar menuBar;
     private JMenu file, game, edit, subMenu;
-    private JMenuItem quit, reset, undo, color, newPlayer, newAI;
+    private JMenuItem quit, reset, undo, color, newPlayer, newAI, simulate;
     private Color bg = new Color(45, 174, 82);
     private Timer timer = new Timer(300, this);;
 
@@ -57,7 +57,9 @@ public class GUI extends JFrame implements ActionListener{
         reset.addActionListener(this);
         undo = new JMenuItem("Undo");
         undo.addActionListener(this);
-        game.add(reset); game.add(undo);
+        simulate = new JMenuItem("Simulate");
+        simulate.addActionListener(this);
+        game.add(reset); game.add(undo); game.add(simulate);
 
         menuBar = new JMenuBar();
         menuBar.add(file); 
@@ -156,6 +158,10 @@ public class GUI extends JFrame implements ActionListener{
             board.reset();
             refreshGrid();
             playingAgainstAI = true;
+        }
+
+        if (e.getSource() == simulate){
+            this.simulate();
         }
     }
 }

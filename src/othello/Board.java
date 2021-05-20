@@ -197,6 +197,13 @@ public class Board{
                 return 1;
             }
         }
+        // When a player occupies 80% of the tiles on the board.
+        if (count(-1) >= 80){
+            return -1;
+        }
+        if (count(1) >= 80){
+            return 1;
+        }
         return 0;
     }
 
