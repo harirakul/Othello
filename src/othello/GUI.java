@@ -88,7 +88,9 @@ public class GUI extends JFrame implements ActionListener{
         SwingUtilities.updateComponentTreeUI(this);
 
         if (board.gameOver() != 0){
-            new ResultGUI(board.gameOver());
+            timer.setRepeats(false);
+            String text = board.gameOver() == 1 ? "Black wins!" : "White wins!";
+            JOptionPane.showMessageDialog(null, text);
             return;
         }
     }
@@ -103,12 +105,15 @@ public class GUI extends JFrame implements ActionListener{
     }
 
     public void onClick(int row, int col){
+        // If the selected square is legal:
         if (board.isLegal(row, col)){
             board.playMove(row, col);
             refreshGrid();
             System.out.println("Engine score: " + Engine.evaluate(board));
 
+            // If the user is in a game against the AI:
             if (playingAgainstAI){
+                // Tell the AI to make a move:
                 timer.setRepeats(false);
                 timer.start(); 
             }
@@ -163,22 +168,5 @@ public class GUI extends JFrame implements ActionListener{
         if (e.getSource() == simulate){
             this.simulate();
         }
-    }
-}
-
-class ResultGUI extends JFrame {
-    private int result;
-
-    public ResultGUI(int result){
-        this.result = result;
-
-        super.setSize(300, 200);
-        super.setTitle("Game Over");
-        super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        String text = this.result == 1 ? "Black wins!" : "White wins!";
-        super.add(new JLabel(text, SwingConstants.CENTER));
-
-        super.setVisible(true);
     }
 }
