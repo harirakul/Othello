@@ -9,6 +9,14 @@ import java.util.Arrays;
 public class Board{
     private int[][] grid;
     private int turn = 1; //Black pieces play first
+
+    private ArrayList<int[][]> history; // Used to undo moves.
+
+    private int[][] offsets = {
+        {0, 1}, {1, 0}, {0, -1}, {-1, 0},   // Adjacent Squares
+        {1, 1}, {1, -1}, {-1, -1}, {-1, 1}  // Diagonal Squares
+    };
+
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_YELLOW = "\u001B[33m";
@@ -19,22 +27,16 @@ public class Board{
     private String AI = ANSI_BLACK + "B " + ANSI_RESET;
     private String emptySpace = "  ";
 
-    private ArrayList<int[][]> history; // Used to undo moves.
-
-    private int[][] offsets = {
-        {0, 1}, {1, 0}, {0, -1}, {-1, 0},   // Adjacent Squares
-        {1, 1}, {1, -1}, {-1, -1}, {-1, 1}  // Diagonal Squares
-    };
-
     public Board(){
-        grid = new int[10][10];
+        grid = new int[10][10]; // The board is 10 x 10
+        // Initialize the tiles in the starting position.
         grid[4][4] = -1;
         grid[5][5] = -1;
         grid[4][5] = 1;
         grid[5][4] = 1;
 
         history = new ArrayList<int[][]>();
-        savePosition(grid);
+        savePosition(grid); // Adds the current (initial) position to the history.
     }
 
     /*
@@ -177,7 +179,6 @@ public class Board{
     public int gameOver(){
         // When all squares are occupied.
         if (isFilled()){
-            System.out.println(count(1) + " " + count(-1));
             // There are more white pieces than black pieces
             if (count(-1) > count(1)){
                 return -1;
@@ -237,6 +238,7 @@ public class Board{
                     for (int[] offset: offsets){
                         int newRow = i + offset[0];
                         int newCol = j + offset[1];
+                        // Continue in the direction of the offset until a tile of the same color is reached.
                         while (inBounds(newRow, newCol) && grid[newRow][newCol] == -turn){
                             newRow += offset[0];
                             newCol += offset[1];

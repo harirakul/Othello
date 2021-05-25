@@ -24,14 +24,14 @@ public class Engine {
                     score += 10 * piece * color;
                 }
 
-                // Adds 25 points if the piece is in the corner.
+                // Adds 40 points if the piece is in the corner.
                 if (board.isCorner(i, j)){
                     score += 40 * piece * color;
                 }
             }
         }
 
-        //Adds 10 points for each legal move available.
+        //Adds 5 points for each legal move available.
         score += board.getLegalMoves().size() * 5;
 
         return score;
@@ -42,15 +42,17 @@ public class Engine {
     */
     public static int minimax(Board board, int depth, int maximizingColor){
         if (depth == 0){
-            return evaluate(board);
+            return evaluate(board); // Return the evaluation of the final node.
         }
 
         Board b = board.copy();
         int value;
 
+        // If it is the inputted (maximizing) color's turn to move.
         if (maximizingColor == b.getTurn()){
             value = -1000;
             ArrayList<Integer[]> legals = b.getLegalMoves();
+            // Play all possible moves and make the next player the maximizingColor.
             for (int i = 0; i < legals.size(); i++){
                 Integer[] move = legals.get(i);
                 b.playMove(move);
@@ -59,9 +61,11 @@ public class Engine {
             return value;
         }
 
+        // If it is the opponent's (minimizing) turn to move.
         else {
             value = 1000;
             ArrayList<Integer[]> legals = b.getLegalMoves();
+            // Play all possible moves and make the next player the maximizingColor.
             for (int i = 0; i < legals.size(); i++){
                 Integer[] move = legals.get(i);
                 b.playMove(move);
@@ -82,15 +86,18 @@ public class Engine {
 
         ArrayList<Integer[]> legals = b.getLegalMoves();
         for (int i = 0; i < legals.size(); i++){
+            // Play each legal move.
             Integer[] move = legals.get(i);
             b.playMove(move[0], move[1]);
 
+            // Make the minimax call, and update variables accordingly.
             if (minimax(board, 4, maximizingColor) > max){
                 bestMove[0] = move[0];
                 bestMove[1] = move[1];
                 max = b.count(maximizingColor);
             }
 
+            // Undo the move so that the same position is used for the next move.
             b.undo();
         }
 

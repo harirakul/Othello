@@ -17,12 +17,13 @@ public class Tile extends JButton {
         this.col = col;
 
         super.setSize(60, 60);
-        super.setBackground(parent.getColor());
+        super.setBackground(parent.getColor()); // Sets the background from the GUI class.
         super.setBorder(new LineBorder(Color.BLACK));
 
         this.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                parent.onClick(row, col);
+                //When the button is clicked, calls the onClick method in the GUI class.
+                parent.onClick(row, col); 
             }
             
         });

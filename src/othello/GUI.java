@@ -20,16 +20,18 @@ public class GUI extends JFrame implements ActionListener{
 
     public GUI()
     {
+        //Initialize tiles in the buttonGrid:
         for (int i = 0; i < 10; i++){
             for (int j = 0; j < 10; j++){
                 buttonGrid[i][j] = new Tile(this, i, j);
             }
         }
         
-        buttonPannel.setLayout(new GridLayout(10, 10));
+        buttonPannel.setLayout(new GridLayout(10, 10)); // Set the layout of the pannel.
         refreshGrid();
         setupMenu();
 
+        // Preferences for the GUI.
         this.setTitle("Othello");
         this.add(buttonPannel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -78,27 +80,32 @@ public class GUI extends JFrame implements ActionListener{
         for (int i = 0; i < 10; i++){
             for (int j = 0; j < 10; j++){
                 Tile t = new Tile(this, i, j);
+                // If the tile is a legal move, Highlight it:
                 t.setHighlighted(board.isLegal(i, j));
+                // Set the tile's corresponding image to the correct piece
                 t.setPiece(board.getPiece(i, j));
                 buttonGrid[i][j] = t;
                 buttonPannel.add(t);
             }
         }
 
+        // Need to update the componentTreeUI for changes to take effect
         SwingUtilities.updateComponentTreeUI(this);
 
+        // If the game is over:
         if (board.gameOver() != 0){
             timer.setRepeats(false);
+            // Show the message of who wins.
             String text = board.gameOver() == 1 ? "Black wins!" : "White wins!";
             JOptionPane.showMessageDialog(null, text);
-            return;
+            return; // Exit the function
         }
     }
 
     public void engineMove(){
         //Integer[] bestMove = board.getTurn() == 1 ? Engine.greedySelection(board): Engine.limitOpponentOptions(board);
         Integer[] bestMove = Engine.bestMove(board);
-        System.out.println("Engine score: " + Engine.evaluate(board));
+        //System.out.println("Engine score: " + Engine.evaluate(board));
         board.playMove(bestMove);
         refreshGrid();
         
@@ -109,7 +116,6 @@ public class GUI extends JFrame implements ActionListener{
         if (board.isLegal(row, col)){
             board.playMove(row, col);
             refreshGrid();
-            System.out.println("Engine score: " + Engine.evaluate(board));
 
             // If the user is in a game against the AI:
             if (playingAgainstAI){
